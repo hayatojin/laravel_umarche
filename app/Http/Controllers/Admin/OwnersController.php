@@ -18,13 +18,15 @@ class OwnersController extends Controller
 
     public function index()
     {
-        $data_now = Carbon::now();
-        $data_parse = Carbon::parse(now());
-        echo $data_now->year;
-        echo $data_parse;
+        // Carbonのテスト
+        // $data_now = Carbon::now();
+        // $data_parse = Carbon::parse(now());
+        // echo $data_now->year;
+        // echo $data_parse;
 
-        $eloqent_all = Owner::all();
-        $query_get = DB::table('owners')->select('name', 'created_at')->get();
+        // エロクアントとクエリビルダの比較テスト
+        // $eloqent_all = Owner::all();
+        // $query_get = DB::table('owners')->select('name', 'created_at')->get();
         // $query_first = DB::table('owners')->select('name')->first();
         // $collection_test = collect([
         //     'name' => 'テスト'
@@ -32,13 +34,15 @@ class OwnersController extends Controller
 
         // var_dump($query_first);
         // dd($eloqent_all, $query_get, $query_first, $collection_test);
-        return view('admin.owners.index', compact('eloqent_all', 'query_get'));
+
+        $owners = Owner::select('name', 'email', 'created_at')->get();
+        return view('admin.owners.index', compact('owners'));
     }
 
 
     public function create()
     {
-        //
+        return view('admin.owners.create');
     }
 
 
