@@ -22,13 +22,13 @@ use App\Http\Controllers\Admin\OwnersController;
 |
 */
 
-Route::get('/', function () {
-    return view('admin.welcome');
-});
+// Route::get('/', function () {
+//     return view('admin.welcome');
+// });
 
 // リソースコントローラー
 Route::resource('owners', OwnersController::class)
-->middleware('auth:admin');
+->middleware('auth:admin')->except(['show']);
 
 // ソフトデリート処理で期限の切れたオーナーを保管
 Route::prefix('expired-owners')->
