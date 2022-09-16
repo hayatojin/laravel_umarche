@@ -37,7 +37,9 @@ class OwnersController extends Controller
         // var_dump($query_first);
         // dd($eloqent_all, $query_get, $query_first, $collection_test);
 
-        $owners = Owner::select('id', 'name', 'email', 'created_at')->get();
+        $owners = Owner::select('id', 'name', 'email', 'created_at')
+        ->paginate(3);
+
         return view('admin.owners.index', compact('owners'));
     }
 
