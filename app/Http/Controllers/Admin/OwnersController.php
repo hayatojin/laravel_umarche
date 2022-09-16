@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Owner; // Eloquent
+use App\Models\Shop;
 use Illuminate\Support\Facades\DB; // クエリビルダ
 use Carbon\Carbon; // Carbonインスタンス
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules; // 独自追加:RegisterUserコントローラからRulesインスタンスのuse文を真似た
+use Throwable;
+use Illuminate\Support\Facades\Log;
 
 class OwnersController extends Controller
 {
@@ -59,11 +62,28 @@ class OwnersController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        Owner::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        // トランザクション処理（管理者側で、オーナー作成と同時にショップも作成する）
+        try{
+            DB::transaction(function()use($request){
+                $owner = Owner::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                ]);
+
+                Shop::create([
+                    'owner_id' => $owner->id,
+                    'name' => '店名を入力してください',
+                    'information' => '',
+                    'filename' => '',
+                    'is_selling' => true
+                ]);
+            }, 2); // 「2」はデッドロック処理（トランザクションの最大試行回数）
+
+        }catch(Throwable $e){
+            Log::error($e);
+            throw $e;
+        }
 
         return redirect()
         ->route('admin.owners.index')

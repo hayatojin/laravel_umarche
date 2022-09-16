@@ -10,6 +10,15 @@ class Shop extends Model
 {
     use HasFactory;
 
+    // Shop登録にあたりShopのデータを更新するため、更新対象のカラムをfillableで限定
+    protected $fillable = [
+        'owner_id',
+        'name',
+        'information',
+        'filename',
+        'is_selling'
+    ];
+
     // Ownerとのリレーション（1対1）
     public function owner()
     {
