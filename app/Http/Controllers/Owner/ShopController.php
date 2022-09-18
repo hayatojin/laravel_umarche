@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Shop;
 use Illuminate\Support\Facades\Storage;
+use InterventionImage;
 
 class ShopController extends Controller
 {
@@ -57,7 +58,14 @@ class ShopController extends Controller
 
         if(!is_null($imageFile) && $imageFile->isValid() )
         {
-        Storage::putFile('public/shops', $imageFile);
+            // Storage::putFile('public/shops', $imageFile); // リサイズなしの場合の処理
+
+            $fileName = uniqid(rand().'_'); // ランダム文字を生成
+            $extension = $imageFile->extension(); // 拡張子を取得
+            $fileNameToStore = $fileName. '.' . $extension; // ランダム文字と拡張子をくっつける
+            $resizedImage = InterventionImage::make($imageFile)->resize(1920, 1080)->encode(); // リサイズ処理
+
+            Storage::put('public/shops/' . $fileNameToStore, $resizedImage );
         }
 
         return redirect()->route('owner.shops.index');
