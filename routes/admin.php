@@ -22,9 +22,9 @@ use App\Http\Controllers\Admin\OwnersController;
 |
 */
 
-// Route::get('/', function () {
-//     return view('admin.welcome');
-// });
+Route::get('/', function () {
+    return view('admin.welcome');
+});
 
 // リソースコントローラー
 Route::resource('owners', OwnersController::class)
