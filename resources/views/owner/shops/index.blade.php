@@ -24,7 +24,7 @@
                                 @endif
                             </div>
                             <div class="text-xl">{{ $shop->name }}</div>
-                            <x-shop-thumbnail :filename="$shop->filename" /> {{-- ショップ画像のあり or なしをコンポーネント化しているため、それを使う --}}
+                            <x-thumbnail :filename="$shop->filename" type="shops" /> {{-- ショップ画像のあり or なしをコンポーネント化しているため、それを使う --}}
                         </div>
                         </a>
                         </div>
