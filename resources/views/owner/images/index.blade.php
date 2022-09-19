@@ -16,12 +16,12 @@
 
                     <div class="flex flex-wrap">
                     @foreach ( $images as $image)
-                        <div class="w-1/4 p-4">
+                        <div class="w-1/4 p-2 md:p-4">
                         {{-- edit画面へアクセスする時に、shopのIDもパラメータで渡す --}}
                         <a href="{{ route('owner.images.edit', ['image' => $image->id ]) }}" >
-                        <div class="border rounded-md p-4">
-                            <div class="text-xl">{{ $image->title }}</div>
+                        <div class="border rounded-md p-2 md:p-4">           
                             <x-thumbnail :filename="$image->filename" type="products" /> {{-- ショップ画像のあり or なしをコンポーネント化しているため、それを使う --}}
+                            <div class="text-gray-700">{{ $image->title }}</div>
                         </div>
                         </a>
                         </div>
