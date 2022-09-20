@@ -132,20 +132,29 @@ class ProductController extends Controller
 
         return redirect()
         ->route('owner.products.index')
-        ->with(['message' => '商品を登録しました。',
-        'status' => 'info']);
+        ->with(['message' => '商品を登録しました。', 'status' => 'info']);
     }
 
-    
-    public function show($id)
-    {
-        //
-    }
-
-   
+  
     public function edit($id)
     {
-        //
+        // 各テーブルに保存されたデータを取ってきて、ビュー側に渡す
+        $product = Product::findOrFail($id); // 1つの商品を選ぶ
+        $quantity = Stock::where('product_id', $product->id)->sum('quantity');
+
+        $shops = Shop::where('owner_id', Auth::id())
+        ->select('id', 'name')
+        ->get();
+
+        $images = Image::where('owner_id', Auth::id())
+        ->select('id', 'title','filename')
+        ->orderBy('updated_at', 'desc')
+        ->get();
+
+        $categories = PrimaryCategory::with('secondary')
+        ->get();
+
+        return view('owner.products.edit', compact('product', 'quantity', 'shops', 'images', 'categories'));
     }
 
    
