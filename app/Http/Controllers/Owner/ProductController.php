@@ -7,8 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Image;
 use App\Models\Product;
-use App\Models\SecondaryCategory;
+use App\Models\PrimaryCategory;
 use App\Models\Owner;
+use App\Models\Shop;
 
 class ProductController extends Controller
 {
@@ -62,7 +63,22 @@ class ProductController extends Controller
     
     public function create()
     {
-        //
+        // ショップテーブルから、ログインしているowner_idで絞り込む
+        $shops = Shop::where('owner_id', Auth::id())
+        ->select('id', 'name')
+        ->get();
+
+        // イメージテーブルから絞り込み
+        $images = Image::where('owner_id', Auth::id())
+        ->select('id', 'title','filename')
+        ->orderBy('updated_at', 'desc')
+        ->get();
+
+        // PrimaryCategoryモデルから、SecondaryCategoryのリレーションを取ってくる
+        $categories = PrimaryCategory::with('secondary')
+        ->get();
+
+        return view('owner.products.create', compact('shops', 'images', 'categories'));
     }
 
     
