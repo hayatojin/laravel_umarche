@@ -4,80 +4,92 @@ namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Image;
+use App\Models\Product;
+use App\Models\SecondaryCategory;
+use App\Models\Owner;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function __construct()
     {
-        //
+        $this->middleware('auth:owners');
+
+        $this->middleware(function ($request, $next) {
+
+            $id = $request->route()->parameter('product'); //imageのid取得
+                if(!is_null($id)){
+                    // オーナーが所有する（オーナーに紐づいた）商品だけに限定するが、
+                    // Productモデルにはowner_idが存在しない。
+                    // そのため、ProductからShopへ繋いで、ShopからOwneridを取得する
+                    $ProductsOwnerId = Product::findOrFail($id)->shop->owner->id;
+                    $ProductId = (int)$ProductsOwnerId; // キャスト 文字列→数値に型変換 
+
+                if($ProductId !== Auth::id()){
+                    abort(404);
+                    }
+                }
+                return $next($request);
+        });
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    
+    public function index()
+    {
+        // ログインしているオーナーが作っているプロダクトをindexとして表示する
+        // auth::idでログインオーナーを取り、shopに繋いで、productをとる　※以下42行目が本項目で解説してるコード
+        // $products = Owner::findOrFail(Auth::id())->shop->product;
+
+        // 42行目のコードでは、N+1問題が発生しているため、withメソッドでまとめる
+        // さらに、リレーション先のEagerロード解消のために、「.」でつなぐ
+        $ownerInfo = Owner::with('shop.product.imageFirst')
+        ->where('id', Auth::id())->get();
+
+        // dd($ownerInfo);
+
+        // 以下コメントアウトは、filenameを取得するための確認（ddで確認すると、配列の中にさらに配列があるため、二重でforeachが必要）
+        // foreach($ownerInfo as $owner){
+        //     // dd($owner->shop->product);
+        //     foreach($owner->shop->product as $product){
+        //         dd($product->imageFirst->filename);
+        //     }
+        // }
+
+        return view('owner.products.index', compact('ownerInfo'));
+    }
+
+    
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+    
     public function store(Request $request)
     {
         //
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    
     public function show($id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+   
     public function edit($id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+   
     public function update(Request $request, $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    
     public function destroy($id)
     {
         //
