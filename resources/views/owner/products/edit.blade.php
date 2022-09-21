@@ -9,9 +9,14 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
+
+                    {{-- コンポーネントの参照箇所 --}}
                     <x-auth-validation-errors class="mb-4" :errors="$errors" />
-                    <form method='post' action="{{ route('owner.products.update',  ['product' => $product->id ]) }}">
+                    <x-flash-message status="session('status')" />
+
+                    <form method="post" action="{{ route('owner.products.update',  ['product' => $product->id ]) }}">
                         @csrf
+                        @method('put')
                         <div class="-m-2">
                             {{-- 商品名 --}}
                             <div class="p-2 w-1/2 mx-auto">
@@ -20,6 +25,7 @@
                                   <input type="text" id="name" name="name" value="{{ $product->name }}" required class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
                                 </div>
                             </div>
+
                             {{-- 商品情報 --}}
                             <div class="p-2 w-1/2 mx-auto">
                                 <div class="relative">
@@ -27,6 +33,7 @@
                                   <textarea id="information" name="information" rows="10" required class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">{{ $product->information }}</textarea>
                                 </div>
                             </div>
+
                             {{-- 価格 --}}
                             <div class="p-2 w-1/2 mx-auto">
                                 <div class="relative">
@@ -34,6 +41,7 @@
                                   <input type="number" id="price" name="price" value="{{ $product->price }}" required class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
                                 </div>
                             </div>
+
                             {{-- 表示順 --}}
                             <div class="p-2 w-1/2 mx-auto">
                                 <div class="relative">

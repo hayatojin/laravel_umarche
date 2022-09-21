@@ -12,6 +12,7 @@ use App\Models\PrimaryCategory;
 use App\Models\Owner;
 use App\Models\Shop;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\ProductRequest;
 
 class ProductController extends Controller
 {
@@ -84,24 +85,8 @@ class ProductController extends Controller
     }
 
     
-    public function store(Request $request)
+    public function store(ProductRequest $request)
     {
-        // dd($request);
-        $request->validate([
-            'name' => 'required|string|max:50',
-            'information' => 'required|string|max:1000',
-            'price' => 'required|integer',
-            'sort_order' => 'nullable|integer',
-            'quantity' => 'required|integer',
-            'shop_id' => 'required|exists:shops,id',
-            'category' => 'required|exists:secondary_categories,id',
-            'image1' => 'nullable|exists:images,id',
-            'image2' => 'nullable|exists:images,id',
-            'image3' => 'nullable|exists:images,id',
-            'image4' => 'nullable|exists:images,id',
-            'is_selling' => 'required'
-        ]);
-
         try{
             DB::transaction(function()use($request){
                 $product = Product::create([
@@ -158,9 +143,22 @@ class ProductController extends Controller
     }
 
    
-    public function update(Request $request, $id)
+    public function update(ProductRequest $request, $id)
     {
-        //
+        $request->validate([
+            'current_quantity' => 'required|integer', 
+        ]);
+
+        $product = Product::findOrFail($id); 
+        $quantity = Stock::where('product_id', $product->id)->sum('quantity');
+
+        // Edit画面で表示している値と、Updateで読み込んだ際に取得したquantityの数が違っていれば
+        if($request->current_quantity !== $quantity){
+            $id = $request->route()->parameter('product'); // ルートパラメータの取得
+            return redirect()->route('owner.produnts.edit', [ 'product' => $id ])
+            ->with(['message' => '在庫数が変更されています。再度確認してください。', 'status' => 'alert']);
+        } else {
+        }
     }
 
     
