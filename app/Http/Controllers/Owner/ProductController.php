@@ -173,11 +173,11 @@ class ProductController extends Controller
                     $product->is_selling = $request->is_selling;
                     $product->save();
 
-                // 数量が1（追加）なら・2（削減）なら
-                if($request->type === '1'){ 
+                // 数量が1（追加）なら・2（削減）なら → 定数を使ってマジックナンバーを防いでいる（「\」から始めることで、use文で読み込まなくても使える）
+                if($request->type === \Constant::PRODUCT_LIST['add']){ 
                     $newQuantity = $request->quantity; 
                 }
-                if($request->type === '2'){ 
+                if($request->type === \Constant::PRODUCT_LIST['reduce']){ 
                     $newQuantity = $request->quantity * -1; 
                 }
 
