@@ -158,7 +158,47 @@ class ProductController extends Controller
             return redirect()->route('owner.produnts.edit', [ 'product' => $id ])
             ->with(['message' => '在庫数が変更されています。再度確認してください。', 'status' => 'alert']);
         } else {
+        try {
+            DB::transaction(function()use($request, $product){
+                    $product->name = $request->name;
+                    $product->information = $request->information;
+                    $product->price = $request->price;
+                    $product->sort_order = $request->sort_order;
+                    $product->shop_id = $request->shop_id;
+                    $product->secondary_category_id = $request->category;
+                    $product->image1 = $request->image1;
+                    $product->image2 = $request->image2;
+                    $product->image3 = $request->image3;
+                    $product->image4 = $request->image4;
+                    $product->is_selling = $request->is_selling;
+                    $product->save();
+
+                // 数量が1（追加）なら・2（削減）なら
+                if($request->type === '1'){ 
+                    $newQuantity = $request->quantity; 
+                }
+                if($request->type === '2'){ 
+                    $newQuantity = $request->quantity * -1; 
+                }
+
+                // Stockは毎回、新規作成
+                Stock::create([
+                    'product_id' => $product->id,
+                    'type' => 1,
+                    'quantity' => $newQuantity
+                ]);
+                
+            }, 2); // 「2」はデッドロック処理（トランザクションの最大試行回数）
+
+        }catch(Throwable $e){
+            Log::error($e);
+            throw $e;
         }
+    }
+
+        return redirect()
+        ->route('owner.products.index')
+        ->with(['message' => '商品情報を更新しました。', 'status' => 'info']);
     }
 
     
