@@ -1,4 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@import 'micromodal'
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+@import 'micromodal';
+@import 'swiper';
