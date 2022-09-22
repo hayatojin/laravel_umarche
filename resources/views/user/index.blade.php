@@ -12,8 +12,9 @@
                     <div class="flex flex-wrap">
                             @foreach ( $products as $product)
                             <div class="w-1/4 p-2 md:p-4">
-                            {{-- edit画面へアクセスする時に、productのIDもパラメータで渡す --}}
-                            <a href="" >
+                            
+                            {{-- 商品詳細画面へ遷移するリンク --}}
+                            <a href="{{ route('user.items.show', ['item' => $product->id ]) }}" >
                             <div class="border rounded-md p-2 md:p-4">           
                                 <x-thumbnail filename="{{ $product->filename ?? ''}}" type="products" /> {{-- 画像のあり or なしをコンポーネント化しているため、それを使う --}}
                                     
