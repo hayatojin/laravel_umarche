@@ -125,7 +125,7 @@ class ProductController extends Controller
     {
         // 各テーブルに保存されたデータを取ってきて、ビュー側に渡す
         $product = Product::findOrFail($id); // 1つの商品を選ぶ
-        $quantity = Stock::where('product_id', $product->id)->sum('quantity');
+        $quantity = Stock::where('product_id', $product->id)->sum('quantity'); // 数量を取得
 
         $shops = Shop::where('owner_id', Auth::id())
         ->select('id', 'name')
