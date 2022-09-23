@@ -14,6 +14,9 @@ storage/app/public/productsフォルダ内に
 保存すると表示されます。
 （productsフォルダがない場合は、事前に作成しておきます）
 
+ショップの画像も表示しているため、
+storage/app/public/shopフォルダを作成し、画像を保存しています。
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
 <p align="center">
