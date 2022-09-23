@@ -29,7 +29,7 @@ class User extends Authenticatable
     ];
 
     // Productテーブルと多対多のリレーション（複数のユーザーが複数の商品を持つ）
-    public function product()
+    public function products()
     {
         return $this->belongsToMany(Product::class, 'carts') // 中間テーブルを定義する時は、第二引数にテーブル名をつける
         ->withPivot(['id', 'quantity']); // 中間テーブルのカラム取得
