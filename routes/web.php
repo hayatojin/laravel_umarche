@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ComponentTestController;
 use App\Http\Controllers\LifeCycleTestController;
 use App\Http\Controllers\User\ItemController;
+use App\Http\Controllers\User\CartController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +28,12 @@ Route::middleware('auth:users')->group(function(){
 
 // 商品詳細画面
 Route::get('show/{item}',[ItemController::class, 'show'])->name('items.show');
+
+// カート関連
+Route::prefix('cart')->
+    middleware('auth:users')->group(function(){
+        Route::post('add', [CartController::class,'add'])->name('cart.add');
+});
 
 // Route::get('/dashboard', function () {
 //     return view('user.dashboard');
