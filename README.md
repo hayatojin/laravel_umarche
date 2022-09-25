@@ -1,9 +1,21 @@
 ## Udemy Laravel講座
 
+## ダウンロード方法
+git clone
+git clone https://github.com/hayatojin/laravel_umarche.git
+
+git clone ブランチ名を指定してダウンロードする場合
+git clone -b ブランチ名 https://github.com/hayatojin/laravel_umarche.git
+
+もしくは、zipファイルでダウンロードしてください
+
 ## インストール方法
+- cd laravel_umarche
+- composer install
+- npm install
+- npm run dev
 
 ## インストール後の実施事項
-
 画像のダミーデータは
 public/imagesフォルダ内に
 sample1.jpg〜sample6.jpgとして保存しています。
