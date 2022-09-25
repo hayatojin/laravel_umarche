@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Cart;
 use App\Models\User;
+use App\Models\Stock;
 use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
@@ -58,6 +59,7 @@ class CartController extends Controller
         return redirect()->route('user.cart.index');
     }
 
+    // Stripe API
     public function checkout()
     {
         $user = User::findOrFail(Auth::id()); // ログインしているユーザー情報を取得
@@ -66,17 +68,36 @@ class CartController extends Controller
         $lineItems = [];
 
         foreach($products as $product){
-            $lineItem = [
-                'name' => $product->name,
-                'description' => $product->information,
-                'amount' => $product->price,
-                'currency' => 'JPY',
-                'quantity' => $product->pivot->quantity,
-            ];
+            $quantity = '';
+            $quantity = Stock::where('product_id', $product->id)->sum('quantity'); // 現在の在庫数を確認
 
-            array_push($lineItems, $lineItem); //foreachで回したそれぞれの商品の中身を、$lineItemsに追加する
+            // カート内の商品数量と、Stockテーブル（在庫）内の商品数量を比べる（Stockテーブルの在庫数量よりも、カート内の商品数が多い場合、購入できない）
+            if($product->pivot->quantity > $quantity){
+                return redirect()->route('user.cart.index');
+            } else {
+            // 在庫よりも、カート内の商品数が少なければ、購入できる（購入処理：Stripe APIでAPI用の変数に値を渡す）
+                $lineItem = [
+                    'name' => $product->name,
+                    'description' => $product->information,
+                    'amount' => $product->price,
+                    'currency' => 'JPY',
+                    'quantity' => $product->pivot->quantity,
+                ];
+
+                array_push($lineItems, $lineItem); //foreachで回したそれぞれの商品の中身を、$lineItemsに追加する
+            }
         }
         // dd($lineItems);
+
+        foreach($products as $product){
+            Stock::create([
+                'product_id' => $product->id,
+                'type' => \Constant::PRODUCT_LIST['reduce'],
+                'quantity' => $product->pivot->quantity * -1
+            ]);
+        }
+
+        dd('test');
 
         \Stripe\Stripe::setApiKey(env(' STRIPE_SECRET_KEY '));
 
