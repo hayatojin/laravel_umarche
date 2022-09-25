@@ -62,33 +62,28 @@ class CartController extends Controller
     // Stripe API
     public function checkout()
     {
-        $user = User::findOrFail(Auth::id()); // ログインしているユーザー情報を取得
+        $user = User::findOrFail(Auth::id());
         $products = $user->products;
-
+        
         $lineItems = [];
-
         foreach($products as $product){
             $quantity = '';
-            $quantity = Stock::where('product_id', $product->id)->sum('quantity'); // 現在の在庫数を確認
+            $quantity = Stock::where('product_id', $product->id)->sum('quantity');
 
-            // カート内の商品数量と、Stockテーブル（在庫）内の商品数量を比べる（Stockテーブルの在庫数量よりも、カート内の商品数が多い場合、購入できない）
             if($product->pivot->quantity > $quantity){
                 return redirect()->route('user.cart.index');
             } else {
-            // 在庫よりも、カート内の商品数が少なければ、購入できる（購入処理：Stripe APIでAPI用の変数に値を渡す）
                 $lineItem = [
                     'name' => $product->name,
                     'description' => $product->information,
                     'amount' => $product->price,
-                    'currency' => 'JPY',
+                    'currency' => 'jpy',
                     'quantity' => $product->pivot->quantity,
                 ];
-
-                array_push($lineItems, $lineItem); //foreachで回したそれぞれの商品の中身を、$lineItemsに追加する
+                array_push($lineItems, $lineItem);    
             }
         }
         // dd($lineItems);
-
         foreach($products as $product){
             Stock::create([
                 'product_id' => $product->id,
@@ -97,20 +92,20 @@ class CartController extends Controller
             ]);
         }
 
-        dd('test');
-
-        \Stripe\Stripe::setApiKey(env(' STRIPE_SECRET_KEY '));
+        \Stripe\Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
+        \Stripe\Stripe::setApiVersion('2020-08-27');
 
         $session = \Stripe\Checkout\Session::create([
             'payment_method_types' => ['card'],
             'line_items' => [$lineItems],
             'mode' => 'payment',
-            'success_url' => route('user.cart.success'),
-            'cancel_url' => route('user.cart.cancel'),
+            'success_url' => route('user.items.index'),
+            'cancel_url' => route('user.cart.index'),
         ]);
 
-        $publickey = env(' STRIPE_PUBLIC_KEY ');
+        $publicKey = env('STRIPE_PUBLIC_KEY');
 
-        return view('user.checkout', compact('sesshon', 'publickey'));
+        return view('user.checkout', 
+            compact('session', 'publicKey'));
     }
 }
