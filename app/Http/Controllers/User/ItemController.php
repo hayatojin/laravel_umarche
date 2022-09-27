@@ -30,9 +30,11 @@ class ItemController extends Controller
         });
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::availableItems()->get(); // Productモデルで定義したスコープを利用
+        $products = Product::availableItems()
+        ->sortOrder($request->sort)
+        ->get(); // Productモデルで定義したスコープを利用
 
         return view('user.index', compact('products'));
     }

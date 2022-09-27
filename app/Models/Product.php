@@ -76,8 +76,7 @@ class Product extends Model
     {
         // Stockテーブルから、在庫数量が1以上の商品を抜き出す
         $stocks = DB::table('t_stocks')
-        ->select('product_id',
-        DB::raw('sum(quantity) as quantity'))
+        ->select('product_id', DB::raw('sum(quantity) as quantity'))
         ->groupBy('product_id')
         ->having('quantity', '>', 1);
 
@@ -94,5 +93,29 @@ class Product extends Model
         ,'products.sort_order as sort_order'
         ,'products.information', 'secondary_categories.name as category'
         ,'image1.filename as filename');
+    }
+
+    // 表示順のスコープ
+    public function scopeSortOrder($query, $sortOrder)
+    {
+        if($sortOrder === null || $sortOrder === \Constant::SORT_ORDER['recommend']){
+            return $query->orderBy('sort_order', 'asc');
+        }
+
+        if($sortOrder === \Constant::SORT_ORDER['higherPrice']){
+            return $query->orderBy('price', 'desc');
+        }
+
+        if($sortOrder === \Constant::SORT_ORDER['lowerPrice']){
+            return $query->orderBy('price', 'asc');
+        }
+
+        if($sortOrder === \Constant::SORT_ORDER['later']){
+            return $query->orderBy('products.created_at', 'desc');
+        }
+
+        if($sortOrder === \Constant::SORT_ORDER['older']){
+            return $query->orderBy('products.created_at', 'asc');
+        }
     }
 }
