@@ -34,7 +34,7 @@ class ItemController extends Controller
     {
         $products = Product::availableItems() // Productモデルで定義したスコープを利用
         ->sortOrder($request->sort) // ビュー側で設定したname属性「sort」がRequestに入ってくる。なので、sortの中身が使える
-        ->paginate($request->pagination); 
+        ->paginate($request->pagination ?? '20'); // ページネーションの値がnull（初期の何もページネーション選んでない場合）なら、20の数値を与える
 
         return view('user.index', compact('products'));
     }
