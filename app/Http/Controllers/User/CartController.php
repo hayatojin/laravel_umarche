@@ -8,6 +8,9 @@ use App\Models\Cart;
 use App\Models\User;
 use App\Models\Stock;
 use Illuminate\Support\Facades\Auth;
+use App\Services\CartService;
+use App\Jobs\SendThanksMail;
+use App\Jobs\SendOrderedMail;
 
 class CartController extends Controller
 {
@@ -50,6 +53,7 @@ class CartController extends Controller
         return redirect()->route('user.cart.index');
     }
 
+
     public function delete($id)
     {
         Cart::where('product_id', $id)
@@ -58,6 +62,7 @@ class CartController extends Controller
 
         return redirect()->route('user.cart.index');
     }
+
 
     // Stripe API
     public function checkout()
@@ -109,12 +114,30 @@ class CartController extends Controller
             compact('session', 'publicKey'));
     }
 
+
     public function success()
     {
+        // メール用のサービスを読み込む
+        $items = Cart::where('user_id', Auth::id())->get(); // ログインしてるユーザのカート情報を取得
+        $products = CartService::getItemsInCart($items); // 上記内容を引き継ぐため、引数に$itemsを設定
+        $user = User::findOrFail(Auth::id());
+        
+        // ユーザー側へのメール送信
+        SendThanksMail::dispatch($products, $user);
+
+        // オーナー側へのメール送信では、複数名へメールを送る可能性があるため、foreachを使う
+        foreach($products as $product)
+        {
+            SendOrderedMail::dispatch($product, $user);
+        }
+
+        // dd('ユーザーメール送信テスト');
+
         Cart::where('user_id', Auth::id())->delete();
 
         return redirect()->route('user.items.index'); // 商品一覧画面へ戻す
     }
+
 
     public function cancel()
     {
