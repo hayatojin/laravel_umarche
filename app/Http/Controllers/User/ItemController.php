@@ -32,9 +32,9 @@ class ItemController extends Controller
 
     public function index(Request $request)
     {
-        $products = Product::availableItems()
-        ->sortOrder($request->sort)
-        ->get(); // Productモデルで定義したスコープを利用
+        $products = Product::availableItems() // Productモデルで定義したスコープを利用
+        ->sortOrder($request->sort) // ビュー側で設定したname属性「sort」がRequestに入ってくる。なので、sortの中身が使える
+        ->paginate($request->pagination); 
 
         return view('user.index', compact('products'));
     }
