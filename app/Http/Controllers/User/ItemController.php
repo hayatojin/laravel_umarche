@@ -42,7 +42,7 @@ class ItemController extends Controller
         // ->send(new TestMail());
 
         // 非同期に送信
-        SendThanksMail::dispatch(); // キューの中にジョブを入れる
+        // SendThanksMail::dispatch(); // キューの中にジョブを入れる
 
         $categories = PrimaryCategory::with('secondary')
         ->get();
