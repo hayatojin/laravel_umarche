@@ -119,7 +119,7 @@ class Product extends Model
         }
     }
 
-
+    // 検索フォーム用カテゴリー
     public function scopeselectCategory($query, $categoryId)
     {
         if($categoryId !== '0')
@@ -127,6 +127,28 @@ class Product extends Model
             return $query->where('secondary_category_id',  $categoryId);
         } else {
             return;
+        }
+    }
+
+    // 検索フォーム用キーワードフォーム
+    public function scopeSearchKeyword($query, $keyword) 
+    {
+        if(!is_null($keyword))
+        {
+            //全角スペースを半角に 
+            $spaceConvert = mb_convert_kana($keyword,'s');
+
+            //空白で区切る 
+            $keywords = preg_split('/[\s]+/', $spaceConvert,-1,PREG_SPLIT_NO_EMPTY);
+
+            foreach($keywords as $word)
+            {
+                $query->where('products.name','like','%'.$word.'%');
+            }
+                return $query;
+
+        } else {
+            return ;
         }
     }
 }

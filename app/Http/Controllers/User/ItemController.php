@@ -34,13 +34,14 @@ class ItemController extends Controller
 
     public function index(Request $request)
     {
-        $products = Product::availableItems() // Productモデルで定義したスコープを利用
-        ->selectCategory($request->category ?? '0') // $request->categoryでカテゴリーIDが入ってくる。もし入ってなければ、初期値として0を返す
-        ->sortOrder($request->sort) // ビュー側で設定したname属性「sort」がRequestに入ってくる。なので、sortの中身が使える
-        ->paginate($request->pagination ?? '20'); // ページネーションの値がnull（初期の何もページネーション選んでない場合）なら、20の数値を与える
-
         $categories = PrimaryCategory::with('secondary')
         ->get();
+        
+        $products = Product::availableItems() // Productモデルで定義したスコープを利用
+        ->selectCategory($request->category ?? '0') // $request->categoryでカテゴリーIDが入ってくる。もし入ってなければ、初期値として0を返す
+        ->searchKeyword($request->keyword)
+        ->sortOrder($request->sort) // ビュー側で設定したname属性「sort」がRequestに入ってくる。なので、sortの中身が使える
+        ->paginate($request->pagination ?? '20'); // ページネーションの値がnull（初期の何もページネーション選んでない場合）なら、20の数値を与える
 
         return view('user.index', compact('products', 'categories'));
     }
