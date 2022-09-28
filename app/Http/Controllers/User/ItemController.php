@@ -9,6 +9,8 @@ use App\Models\Stock;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\PrimaryCategory;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TestMail;
 
 class ItemController extends Controller
 {
@@ -34,9 +36,12 @@ class ItemController extends Controller
 
     public function index(Request $request)
     {
+        Mail::to('test@example.com')
+        ->send(new TestMail());
+
         $categories = PrimaryCategory::with('secondary')
         ->get();
-        
+
         $products = Product::availableItems() // Productモデルで定義したスコープを利用
         ->selectCategory($request->category ?? '0') // $request->categoryでカテゴリーIDが入ってくる。もし入ってなければ、初期値として0を返す
         ->searchKeyword($request->keyword)
